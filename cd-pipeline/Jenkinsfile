@@ -1,0 +1,20 @@
+node("$SLAVE_NODE") {
+
+	stage("Checkout"){
+	        cleanWs();
+      
+        	git url: 'git@bitbucket.org:innospheratech/ci-cd.git', 
+        	credentialsId: 'github-creds'
+	
+	}
+
+	stage("Deployment"){
+		sh '''
+			export USER_BUILD_NUMBER=${DEPLOY_BUILD_NUMBER}
+            export service_name=echo ${env.JOB_NAME} | awk 'BEGIN {FS=OFS="-"} {print $1, $2}'
+			cd cd-pipeline
+			docker-compose up -d $service_name
+		'''
+
+	}
+}

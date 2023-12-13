@@ -1,0 +1,19 @@
+node() {
+    
+   stage('Checkout') {
+        cleanWs();
+      
+        git url: 'git@bitbucket.org:GALAXYGROUP_Ltd/${env.JOB_NAME}.git', 
+        credentialsId: 'github-creds',
+	branch: "${env.BRANCH_NAME}"
+   }
+   
+   stage('Build Docker Images'){
+        sh "docker build -t  galaxygroupbiz/${env.JOB_NAME}:${env.BUILD_NUMBER} ."
+   }
+   
+   stage('Push Images to DockerHub'){
+        sh "docker push galaxygroupbiz/${env.JOB_NAME}:${env.BUILD_NUMBER}"
+   }
+}
+

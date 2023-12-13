@@ -1,0 +1,22 @@
+node() {
+    
+   stage('Checkout') {
+        cleanWs();
+      
+        git url: 'git@bitbucket.org:innospheratech/${env.JOB_NAME}.git', 
+        credentialsId: 'github-creds',
+	branch: 'master'
+   }
+   
+   stage('Build Microservices'){
+       sh 'mvn clean package -Dmaven.test.skip=true'
+   }
+
+   stage('Build Docker Images'){
+        sh "docker build -t  galaxygroupbiz/${env.ENVIRONMENT}-${env.JOB_NAME}:${env.BUILD_NUMBER} ."
+   }
+   
+   stage('Push Images to DockerHub'){
+        sh "docker push galaxygroupbiz/${env.ENVIRONMENT}-${env.JOB_NAME}:${env.BUILD_NUMBER}"
+   }
+}
